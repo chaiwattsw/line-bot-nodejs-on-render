@@ -40,6 +40,7 @@ app.post("/webhook", async (req, res) => {
             event.message.text === "สู้ต่อไป"
         ) {
             try {
+                console.log("SENDING MESSAGE...");
                 await sendReminderMessages(event.replyToken); // Trigger the reminder job and pass the replyToken
             } catch (err) {
                 console.error("Failed to send reminder messages:", err);
@@ -72,6 +73,8 @@ async function getPassportsToSendReminders() {
         console.error("Failed to retrieve passports:", error);
         return [];
     }
+
+    console.log("DATA", data);
 
     return data || [];
 }
