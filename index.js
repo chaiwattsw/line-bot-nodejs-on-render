@@ -39,7 +39,11 @@ app.post("/webhook", async (req, res) => {
             event.message.type === "text" &&
             event.message.text === "สู้ต่อไป"
         ) {
-            await sendReminderMessages(event.replyToken); // Trigger the reminder job and pass the replyToken
+            try {
+                await sendReminderMessages(event.replyToken); // Trigger the reminder job and pass the replyToken
+            } catch (err) {
+                console.error("Failed to send reminder messages:", err);
+            }
         }
     }
 
@@ -65,7 +69,7 @@ async function getPassportsToSendReminders() {
         .limit(3); // Adjust the limit to retrieve three passports
 
     if (error) {
-        console.error(error);
+        console.error("Failed to retrieve passports:", error);
         return [];
     }
 
@@ -75,6 +79,11 @@ async function getPassportsToSendReminders() {
 // Define function to send reminder messages
 async function sendReminderMessages(replyToken) {
     const passports = await getPassportsToSendReminders();
+
+    if (passports.length === 0) {
+        console.log("No passports to send reminders");
+        return;
+    }
 
     for (const passport of passports) {
         const userId = passport.user_id; // Assuming there is a user_id column in the passports table
@@ -145,7 +154,13 @@ async function sendReminderMessages(replyToken) {
 }
 
 // Schedule the sendReminderMessages function to run every day at 3:00 PM UTC
-cron.schedule("0 15 * * *", sendReminderMessages); // Runs once every day at 3:00 PM UTC
+cron.schedule("0 15 * * *", () => {
+    try {
+        sendReminderMessages(); // Run the reminder job without a replyToken
+    } catch (err) {
+        console.error("Failed to send reminder messages:", err);
+    }
+}); // Runs once every day at 3:00 PM UTC
 
 // Start the server
 const port = process.env.PORT || 3000;
