@@ -17,13 +17,17 @@ const lineClient = new Client(lineConfig);
 const app = express();
 
 app.use(express.json());
+app.use(
+    express.urlencoded({
+        extended: true,
+    }),
+);
 
-app.post("/webhook", middleware(lineConfig), async (req, res) => {
+app.post("/webhook", async (req, res) => {
     try {
         const { events } = req.body;
 
         for (const event of events) {
-            console.log(event);
             if (
                 event.type === "message" &&
                 event.message.type === "text" &&
@@ -52,6 +56,8 @@ app.post("/webhook", middleware(lineConfig), async (req, res) => {
                         type: "text",
                         text: `แจ้งเตือนวีซ่า ${passport_number} ใกล้หมดอายุ\nName-Surname: ${first_name} ${last_name}\nPassport No.: ${passport_number}\nExpired date: ${visa_date}\nAgent: ${agency}`,
                     };
+
+                    console.log(message);
 
                     await lineClient.replyMessage(event.replyToken, message);
                 }
