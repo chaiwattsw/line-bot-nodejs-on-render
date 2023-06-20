@@ -112,7 +112,7 @@ async function sendReminderMessages(replyToken) {
                             contents: [
                                 {
                                     type: "text",
-                                    text: `❌ Name:\n${passport.fist_name} ${passport.last_name}`,
+                                    text: `❌ Name:\n${passport.first_name} ${passport.last_name}`,
                                     size: "md",
                                 },
                                 {
