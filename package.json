@@ -2,11 +2,11 @@
     "name": "passport-bot",
     "version": "0.0.0",
     "description": "An example LINE bot with TypeScript",
-    "main": "./dist/index.js",
+    "main": "./index.js",
     "scripts": {
         "clean": "rimraf ./dist",
-        "build": "npm install && tsc",
-        "start": "node dist/index.js"
+        "build": "npm install",
+        "start": "node index.js"
     },
     "author": "Nicholas Dwiarto <nicholasdwiarto@yahoo.com> (https://nicholasdw.com)",
     "dependencies": {
