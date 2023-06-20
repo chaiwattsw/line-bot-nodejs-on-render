@@ -42,13 +42,12 @@ app.post("/webhook", async (req, res) => {
             try {
                 console.log("SENDING MESSAGE...");
                 await sendReminderMessages(event.replyToken); // Trigger the reminder job and pass the replyToken
+                res.status(200).end();
             } catch (err) {
                 console.error("Failed to send reminder messages:", err);
             }
         }
     }
-
-    res.status(200).end();
 });
 
 // Define function to get passports to send reminders
