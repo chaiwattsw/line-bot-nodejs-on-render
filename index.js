@@ -88,8 +88,6 @@ async function sendReminderMessages(replyToken) {
     }
 
     for (const passport of passports) {
-        const userId = passport.user_id; // Assuming there is a user_id column in the passports table
-
         const flexMessage = {
             type: "flex",
             altText: "Visa Expiry Reminder",
@@ -109,7 +107,7 @@ async function sendReminderMessages(replyToken) {
                     contents: [
                         {
                             type: "text",
-                            text: `💀 แจ้งเตือนวีซ่า TR60 ${passport.passport_no} ใกล้หมดอายุ 💀`,
+                            text: `💀 แจ้งเตือนวีซ่า TR60 ${passport.passport_number} ใกล้หมดอายุ 💀`,
                             weight: "bold",
                             size: "md",
                         },
@@ -120,17 +118,17 @@ async function sendReminderMessages(replyToken) {
                             contents: [
                                 {
                                     type: "text",
-                                    text: `❌ Name-Surname: ${passport.name_surname}`,
+                                    text: `❌ Name-Surname: ${passport.fist_name} ${passport.last_name}`,
                                     size: "md",
                                 },
                                 {
                                     type: "text",
-                                    text: `❌ Passport No.: ${passport.passport_no}`,
+                                    text: `❌ Passport No.: ${passport.passport_number}`,
                                     size: "md",
                                 },
                                 {
                                     type: "text",
-                                    text: `❌ Expired date: ${passport.expired_date}`,
+                                    text: `❌ Expired date: ${passport.visa_date}`,
                                     size: "md",
                                 },
                                 {
@@ -147,10 +145,10 @@ async function sendReminderMessages(replyToken) {
 
         try {
             // Send the message using the LINE Bot SDK or your preferred messaging service
+            console.log("REPLYING...");
             await lineClient.replyMessage(replyToken, flexMessage); // Use lineClient.replyMessage instead
-            console.log(`Message sent to user ${userId}`);
         } catch (err) {
-            console.error(`Failed to send message to user ${userId}:`, err);
+            console.error(err);
         }
     }
 }
