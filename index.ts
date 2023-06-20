@@ -35,9 +35,9 @@ const client = new Client(clientConfig);
 const app: Application = express();
 
 // Create a new Supabase client.
-const supabaseUrl = "YOUR_SUPABASE_URL";
-const supabaseKey = "YOUR_SUPABASE_KEY";
-const supabase: SupabaseClient = createClient(supabaseUrl, supabaseKey);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase: SupabaseClient = createClient(supabaseUrl!, supabaseKey!);
 
 // Function to fetch the passport data from Supabase.
 const fetchPassportData = async (): Promise<PostgrestResponse<any> | null> => {
