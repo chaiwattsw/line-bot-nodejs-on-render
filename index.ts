@@ -51,7 +51,7 @@ const fetchPassportData = async (): Promise<PostgrestResponse<any> | null> => {
             return null;
         }
 
-        return data;
+        return data as any;
     } catch (error) {
         console.error(error);
         return null;
@@ -68,7 +68,7 @@ const textEventHandler = async (
     }
 
     // Fetch the passport data from Supabase.
-    const passportData = await fetchPassportData();
+    const passportData: any = await fetchPassportData();
 
     // Check if passportData exists.
     if (passportData) {
