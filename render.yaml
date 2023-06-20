@@ -3,8 +3,8 @@ services:
       name: passport-bot
       env: node
       repo: https://github.com/chaiwattsw/line-bot-nodejs-on-render.git
-      buildCommand: npm install
-      startCommand: node .
+      buildCommand: npm build
+      startCommand: npm start
       plan: free
       autoDeploy: false
       envVars:
