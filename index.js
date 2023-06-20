@@ -109,22 +109,22 @@ async function sendReminderMessages() {
                             contents: [
                                 {
                                     type: "text",
-                                    text: `Name-Surname: ${passport.name_surname}`,
+                                    text: `❌ Name-Surname: ${passport.name_surname}`,
                                     size: "md",
                                 },
                                 {
                                     type: "text",
-                                    text: `Passport No.: ${passport.passport_no}`,
+                                    text: `❌ Passport No.: ${passport.passport_no}`,
                                     size: "md",
                                 },
                                 {
                                     type: "text",
-                                    text: `Expired date: ${passport.expired_date}`,
+                                    text: `❌ Expired date: ${passport.expired_date}`,
                                     size: "md",
                                 },
                                 {
                                     type: "text",
-                                    text: `Agent: ${passport.agent}`,
+                                    text: `❌ Agent: ${passport.agent}`,
                                     size: "md",
                                 },
                             ],
