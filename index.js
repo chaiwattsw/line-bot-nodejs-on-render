@@ -22,7 +22,12 @@ app.post("/webhook", lineClient.middleware(lineConfig), async (req, res) => {
         const { events } = req.body;
 
         for (const event of events) {
-            if (event.type === "message" && event.message.type === "text") {
+            console.log(event);
+            if (
+                event.type === "message" &&
+                event.message.type === "text" &&
+                event.message.text === "สู้ต่อไป"
+            ) {
                 const { data: passports, error } = await supabase
                     .from("passports")
                     .select(
