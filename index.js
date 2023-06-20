@@ -91,7 +91,7 @@ async function sendReminderMessages(replyToken) {
                     type: "image",
                     url: "https://example.com/image.jpg",
                     size: "full",
-                    aspectRatio: "20:13",
+                    aspectRatio: "16:9",
                     aspectMode: "cover",
                 },
                 body: {
