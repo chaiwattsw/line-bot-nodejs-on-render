@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
-const { createClient } = require("@supabase/supabase-js");
 const { Client } = require("@line/bot-sdk");
+const { createClient } = require("@supabase/supabase-js");
 const cron = require("node-cron");
 const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
@@ -24,7 +24,11 @@ const lineClient = new Client(lineConfig);
 const app = express();
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(
+    express.urlencoded({
+        extended: true,
+    }),
+);
 
 app.post("/webhook", async (req, res) => {
     const events = req.body.events;
@@ -58,7 +62,7 @@ async function getPassportsToSendReminders() {
                 .and(passport("visa_date").isBefore(fortyFiveDaysLater))
                 .or(passport("visa_date").isSame(thirtyDaysLater, "day")),
         )
-        .limit(25); // Adjust the limit as per your requirement
+        .limit(3); // Adjust the limit to retrieve three passports
 
     if (error) {
         console.error(error);
@@ -73,44 +77,55 @@ async function sendReminderMessages() {
     const passports = await getPassportsToSendReminders();
 
     for (const passport of passports) {
-        const userId = passport.id; // Assuming there is a user_id column in the passports table
+        const userId = passport.user_id; // Assuming there is a user_id column in the passports table
 
-        const message = {
+        const flexMessage = {
             type: "flex",
-            altText: "Visa Expiration Reminder",
+            altText: "Visa Expiry Reminder",
             contents: {
                 type: "bubble",
+                hero: {
+                    type: "image",
+                    url: "https://example.com/image.jpg",
+                    size: "full",
+                    aspectRatio: "20:13",
+                    aspectMode: "cover",
+                },
                 body: {
                     type: "box",
                     layout: "vertical",
+                    spacing: "md",
                     contents: [
                         {
                             type: "text",
-                            text: "แจ้งเตือนวีซ่า TR60 ใกล้หมดอายุ",
+                            text: `💀 แจ้งเตือนวีซ่า TR60 ${passport.passport_no} ใกล้หมดอายุ 💀`,
                             weight: "bold",
-                            size: "lg",
+                            size: "md",
                         },
                         {
                             type: "box",
                             layout: "vertical",
-                            margin: "lg",
                             spacing: "sm",
                             contents: [
                                 {
                                     type: "text",
-                                    text: `Name-Surname: ${passport.name}`,
+                                    text: `Name-Surname: ${passport.name_surname}`,
+                                    size: "md",
                                 },
                                 {
                                     type: "text",
                                     text: `Passport No.: ${passport.passport_no}`,
+                                    size: "md",
                                 },
                                 {
                                     type: "text",
                                     text: `Expired date: ${passport.expired_date}`,
+                                    size: "md",
                                 },
                                 {
                                     type: "text",
                                     text: `Agent: ${passport.agent}`,
+                                    size: "md",
                                 },
                             ],
                         },
@@ -121,7 +136,7 @@ async function sendReminderMessages() {
 
         try {
             // Send the message using the LINE Bot SDK or your preferred messaging service
-            await lineClient.pushMessage(userId, message);
+            await lineClient.pushMessage(userId, flexMessage);
             console.log(`Message sent to user ${userId}`);
         } catch (err) {
             console.error(`Failed to send message to user ${userId}:`, err);
