@@ -1,4 +1,5 @@
 // Import all dependencies, mostly using destructuring for better view.
+import "dotenv/config";
 import {
     ClientConfig,
     Client,
