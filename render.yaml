@@ -6,9 +6,13 @@ services:
       buildCommand: npm build
       startCommand: npm start
       plan: free
-      autoDeploy: false
+      autoDeploy: true
       envVars:
           - key: CHANNEL_ACCESS_TOKEN
-            sync: false
+            sync: true
           - key: CHANNEL_SECRET
-            sync: false
+            sync: true
+          - key: SUPABASE_URL
+            sync: true
+          - key: SUPABSE_KEY
+            sync: true
