@@ -1,16 +1,14 @@
 require("dotenv").config();
 const express = require("express");
-const Client = require("@line/bot-sdk");
 const { createClient } = require("@supabase/supabase-js");
+const { Client } = require("@line/bot-sdk");
 const cron = require("node-cron");
 const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
 const isSameOrAfter = require("dayjs/plugin/isSameOrAfter");
-const isBefore = require("dayjs/plugin/isBefore");
 
 dayjs.extend(utc);
 dayjs.extend(isSameOrAfter);
-dayjs.extend(isBefore);
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -26,11 +24,7 @@ const lineClient = new Client(lineConfig);
 const app = express();
 
 app.use(express.json());
-app.use(
-    express.urlencoded({
-        extended: true,
-    }),
-);
+app.use(express.urlencoded({ extended: true }));
 
 app.post("/webhook", async (req, res) => {
     const events = req.body.events;
@@ -60,8 +54,8 @@ async function getPassportsToSendReminders() {
         .select("*")
         .where((passport) =>
             passport("visa_date")
-                .gte(currentDate)
-                .and(passport("visa_date").lt(fortyFiveDaysLater))
+                .isSameOrAfter(currentDate)
+                .and(passport("visa_date").isBefore(fortyFiveDaysLater))
                 .or(passport("visa_date").isSame(thirtyDaysLater, "day")),
         )
         .limit(25); // Adjust the limit as per your requirement
@@ -80,14 +74,54 @@ async function sendReminderMessages() {
 
     for (const passport of passports) {
         const userId = passport.user_id; // Assuming there is a user_id column in the passports table
-        const message = "Reminder: Your visa date is approaching!";
+
+        const message = {
+            type: "flex",
+            altText: "Visa Expiration Reminder",
+            contents: {
+                type: "bubble",
+                body: {
+                    type: "box",
+                    layout: "vertical",
+                    contents: [
+                        {
+                            type: "text",
+                            text: "แจ้งเตือนวีซ่า TR60 ใกล้หมดอายุ",
+                            weight: "bold",
+                            size: "lg",
+                        },
+                        {
+                            type: "box",
+                            layout: "vertical",
+                            margin: "lg",
+                            spacing: "sm",
+                            contents: [
+                                {
+                                    type: "text",
+                                    text: `Name-Surname: ${passport.name}`,
+                                },
+                                {
+                                    type: "text",
+                                    text: `Passport No.: ${passport.passport_no}`,
+                                },
+                                {
+                                    type: "text",
+                                    text: `Expired date: ${passport.expired_date}`,
+                                },
+                                {
+                                    type: "text",
+                                    text: `Agent: ${passport.agent}`,
+                                },
+                            ],
+                        },
+                    ],
+                },
+            },
+        };
 
         try {
             // Send the message using the LINE Bot SDK or your preferred messaging service
-            await lineClient.pushMessage(userId, {
-                type: "text",
-                text: message,
-            });
+            await lineClient.pushMessage(userId, message);
             console.log(`Message sent to user ${userId}`);
         } catch (err) {
             console.error(`Failed to send message to user ${userId}:`, err);
