@@ -73,7 +73,7 @@ async function sendReminderMessages() {
     const passports = await getPassportsToSendReminders();
 
     for (const passport of passports) {
-        const userId = passport.user_id; // Assuming there is a user_id column in the passports table
+        const userId = passport.id; // Assuming there is a user_id column in the passports table
 
         const message = {
             type: "flex",
