@@ -60,12 +60,6 @@ async function getPassportsToSendReminders() {
     const { data, error } = await supabase
         .from("passports")
         .select("*")
-        .where((passport) =>
-            passport("visa_date")
-                .isSameOrAfter(currentDate)
-                .and(passport("visa_date").isBefore(fortyFiveDaysLater))
-                .or(passport("visa_date").isSame(thirtyDaysLater, "day")),
-        )
         .limit(3); // Adjust the limit to retrieve three passports
 
     if (error) {
