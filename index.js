@@ -1,6 +1,7 @@
+require("dotenv").config();
 const express = require("express");
 const { createClient } = require("@supabase/supabase-js");
-const { Client } = require("@line/bot-sdk");
+const { Client, middleware } = require("@line/bot-sdk");
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -17,7 +18,7 @@ const app = express();
 
 app.use(express.json());
 
-app.post("/webhook", lineClient.middleware(lineConfig), async (req, res) => {
+app.post("/webhook", middleware(lineConfig), async (req, res) => {
     try {
         const { events } = req.body;
 
