@@ -39,7 +39,7 @@ app.post("/webhook", async (req, res) => {
             event.message.type === "text" &&
             event.message.text === "สู้ต่อไป"
         ) {
-            await sendReminderMessages(); // Trigger the reminder job
+            await sendReminderMessages(event.replyToken); // Trigger the reminder job and pass the replyToken
         }
     }
 
@@ -73,7 +73,7 @@ async function getPassportsToSendReminders() {
 }
 
 // Define function to send reminder messages
-async function sendReminderMessages() {
+async function sendReminderMessages(replyToken) {
     const passports = await getPassportsToSendReminders();
 
     for (const passport of passports) {
@@ -136,7 +136,7 @@ async function sendReminderMessages() {
 
         try {
             // Send the message using the LINE Bot SDK or your preferred messaging service
-            await lineClient.pushMessage(userId, flexMessage);
+            await lineClient.replyMessage(replyToken, flexMessage); // Use lineClient.replyMessage instead
             console.log(`Message sent to user ${userId}`);
         } catch (err) {
             console.error(`Failed to send message to user ${userId}:`, err);
