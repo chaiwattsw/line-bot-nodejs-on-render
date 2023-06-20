@@ -1,7 +1,16 @@
 require("dotenv").config();
 const express = require("express");
+const Client = require("@line/bot-sdk");
 const { createClient } = require("@supabase/supabase-js");
-const { Client, middleware } = require("@line/bot-sdk");
+const cron = require("node-cron");
+const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+const isSameOrAfter = require("dayjs/plugin/isSameOrAfter");
+const isBefore = require("dayjs/plugin/isBefore");
+
+dayjs.extend(utc);
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isBefore);
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -24,53 +33,73 @@ app.use(
 );
 
 app.post("/webhook", async (req, res) => {
-    try {
-        const { events } = req.body;
+    const events = req.body.events;
 
-        for (const event of events) {
-            if (
-                event.type === "message" &&
-                event.message.type === "text" &&
-                event.message.text === "สู้ต่อไป"
-            ) {
-                const { data: passports, error } = await supabase
-                    .from("passports")
-                    .select(
-                        "first_name,last_name,passport_number,visa_date,agency",
-                    );
-
-                if (error) {
-                    throw new Error(error.message);
-                }
-
-                for (const passport of passports) {
-                    const {
-                        first_name,
-                        last_name,
-                        passport_number,
-                        visa_date,
-                        agency,
-                    } = passport;
-
-                    const message = {
-                        type: "text",
-                        text: `แจ้งเตือนวีซ่า ${passport_number} ใกล้หมดอายุ\nName-Surname: ${first_name} ${last_name}\nPassport No.: ${passport_number}\nExpired date: ${visa_date}\nAgent: ${agency}`,
-                    };
-
-                    console.log(message);
-
-                    await lineClient.replyMessage(event.replyToken, message);
-                }
-            }
+    for (const event of events) {
+        if (
+            event.type === "message" &&
+            event.message.type === "text" &&
+            event.message.text === "สู้ต่อไป"
+        ) {
+            await sendReminderMessages(); // Trigger the reminder job
         }
-
-        res.status(200).end();
-    } catch (error) {
-        console.error("Error handling Line Bot event:", error);
-        res.status(500).end();
     }
+
+    res.status(200).end();
 });
 
-app.listen(3000, () => {
-    console.log("Server is running on port 3000");
+// Define function to get passports to send reminders
+async function getPassportsToSendReminders() {
+    const currentDate = dayjs().utc(); // Get current UTC date and time
+    const thirtyDaysLater = currentDate.add(30, "days");
+    const fortyFiveDaysLater = currentDate.add(45, "days");
+
+    // Query the passports table for records matching the conditions
+    const { data, error } = await supabase
+        .from("passports")
+        .select("*")
+        .where((passport) =>
+            passport("visa_date")
+                .gte(currentDate)
+                .and(passport("visa_date").lt(fortyFiveDaysLater))
+                .or(passport("visa_date").isSame(thirtyDaysLater, "day")),
+        )
+        .limit(25); // Adjust the limit as per your requirement
+
+    if (error) {
+        console.error(error);
+        return [];
+    }
+
+    return data || [];
+}
+
+// Define function to send reminder messages
+async function sendReminderMessages() {
+    const passports = await getPassportsToSendReminders();
+
+    for (const passport of passports) {
+        const userId = passport.user_id; // Assuming there is a user_id column in the passports table
+        const message = "Reminder: Your visa date is approaching!";
+
+        try {
+            // Send the message using the LINE Bot SDK or your preferred messaging service
+            await lineClient.pushMessage(userId, {
+                type: "text",
+                text: message,
+            });
+            console.log(`Message sent to user ${userId}`);
+        } catch (err) {
+            console.error(`Failed to send message to user ${userId}:`, err);
+        }
+    }
+}
+
+// Schedule the sendReminderMessages function to run every day at 3:00 PM UTC
+cron.schedule("0 15 * * *", sendReminderMessages); // Runs once every day at 3:00 PM UTC
+
+// Start the server
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
 });
