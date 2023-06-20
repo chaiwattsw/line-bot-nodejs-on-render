@@ -1,17 +1,17 @@
 services:
-- type: web
-  name: line-bot-nodejs-echo
-  env: node
-  repo: https://github.com/line/line-bot-sdk-nodejs.git
-  buildCommand: cd examples/echo-bot;npm install
-  startCommand: cd examples/echo-bot;node .
-  plan: free
-  autoDeploy: false
-  envVars:
-  - key: CHANNEL_ACCESS_TOKEN
-    sync: false
-  - key: CHANNEL_SECRET
-    sync: false
+    - type: web
+      name: line-bot-nodejs-echo
+      env: node
+      repo: https://github.com/line/line-bot-sdk-nodejs.git
+      buildCommand: cd examples/echo-bot;npm install
+      startCommand: cd examples/echo-bot;node .
+      plan: free
+      autoDeploy: false
+      envVars:
+          - key: 0cdqlOYoOAZ/Tjwjxedi/iXDy/M4u3Yl+MTZCVT8nKk1BmA50Rm4WCVx4cQZZdHqsB7sIhzQi0Er8JPHdEXKANN11JSwYZVMeRnu71zmz97jXa4Iv+KFAr5pDwwyUDthm1LGj56tNDTTXZNDSAVdZAdB04t89/1O/w1cDnyilFU=
+            sync: false
+          - key: d91c082448e0623851d11d4137eeec43
+            sync: false
 # - type: web
 #   name: line-bot-nodejs-echo-ts
 #   env: node
