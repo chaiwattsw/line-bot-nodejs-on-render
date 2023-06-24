@@ -59,7 +59,7 @@ async function getPassportsToSendReminders() {
     // Query the passports table for records matching the conditions
     const { data, error } = await supabase
         .from("passports")
-        .select("first_name,last_name,visa_date,passport_number,");
+        .select("first_name,last_name,visa_date,passport_number");
 
     if (error) {
         console.error("Failed to retrieve passports:", error);
