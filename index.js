@@ -59,8 +59,7 @@ async function getPassportsToSendReminders() {
     // Query the passports table for records matching the conditions
     const { data, error } = await supabase
         .from("passports")
-        .select("*")
-        .limit(3); // Adjust the limit to retrieve three passports
+        .select("first_name,last_name,visa_date,passport_number,");
 
     if (error) {
         console.error("Failed to retrieve passports:", error);
@@ -89,7 +88,7 @@ async function sendReminderMessages(replyToken) {
                 type: "bubble",
                 hero: {
                     type: "image",
-                    url: "https://example.com/image.jpg",
+                    url: "https://hromjftsudnjujqgymxu.supabase.co/storage/v1/object/public/passport-management-assets/qallogo.jpg",
                     size: "full",
                     aspectRatio: "16:9",
                     aspectMode: "cover",
