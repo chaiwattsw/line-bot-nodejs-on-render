@@ -66,7 +66,7 @@ async function getPassportsToSendReminders() {
         return [];
     }
 
-    console.log("DATA", data);
+    console.log("Passport data", data);
 
     return data || [];
 }
@@ -84,6 +84,7 @@ async function sendReminderMessages(replyToken) {
         const flexMessage = {
             type: "flex",
             altText: "Visa Expiry Reminder",
+            size: "full",
             contents: {
                 type: "bubble",
                 hero: {
@@ -100,7 +101,7 @@ async function sendReminderMessages(replyToken) {
                     contents: [
                         {
                             type: "text",
-                            text: `💀 แจ้งเตือนวีซ่า TR60\n${passport.passport_number}\nใกล้หมดอายุ 💀`,
+                            text: `🐌 แจ้งเตือนวีซ่า TR60\n${passport.passport_number}\nใกล้หมดอายุ`,
                             weight: "bold",
                             size: "md",
                         },
@@ -111,22 +112,22 @@ async function sendReminderMessages(replyToken) {
                             contents: [
                                 {
                                     type: "text",
-                                    text: `❌ Name:\n${passport.first_name} ${passport.last_name}`,
+                                    text: `✅ Name:\n${passport.first_name} ${passport.last_name}`,
                                     size: "md",
                                 },
                                 {
                                     type: "text",
-                                    text: `❌ Passport No.:\n${passport.passport_number}`,
+                                    text: `✅ Passport No.:\n${passport.passport_number}`,
                                     size: "md",
                                 },
                                 {
                                     type: "text",
-                                    text: `❌ Expired date:\n${passport.visa_date}`,
+                                    text: `✅ Expired date:\n${passport.visa_date}`,
                                     size: "md",
                                 },
                                 {
                                     type: "text",
-                                    text: `❌ Agency:\n${
+                                    text: `✅ Agency:\n${
                                         passport?.agency || "-"
                                     }`,
                                     size: "md",
